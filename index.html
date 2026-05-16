@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Авокадо Кликер</title>
+    <title>Авокадо Кликер | Чистовой аукцион</title>
     <style>
         * {
             user-select: none;
@@ -12,88 +12,33 @@
             margin: 0;
             padding: 0;
         }
-        body {
+        html, body {
             min-height: 100vh;
             background: radial-gradient(circle at 30% 40%, #a8e6a0, #2d5a1e);
             font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-            padding: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            padding: 0;
+            margin: 0;
         }
-        .modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.92);
-            backdrop-filter: blur(12px);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 2000;
-        }
-        .modal-content {
-            background: #1a4a2a;
-            border-radius: 56px;
-            padding: 30px 24px;
-            text-align: center;
-            max-width: 320px;
-            width: 90%;
-            border: 3px solid #a5d6a5;
-        }
-        .modal-content h2 { color: #f5e6d3; margin-bottom: 20px; }
-        .modal-content input {
-            width: 100%;
-            padding: 14px;
-            border-radius: 60px;
-            border: none;
-            background: #2d6a1f;
-            color: #f5e6d3;
-            font-size: 1.1rem;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .modal-content button {
-            background: #6fbf4c;
-            border: none;
-            padding: 12px 28px;
-            border-radius: 60px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            width: 100%;
-            color: #1a4a2a;
-        }
-        .error-msg { color: #ffb3b3; margin-top: 10px; font-size: 0.8rem; }
-        /* Основное приложение - фиксированная высота до низа экрана */
         .app {
-            max-width: 550px;
+            max-width: 100%;
             width: 100%;
-            min-height: calc(100vh - 24px);
+            min-height: 100vh;
             background: rgba(30, 50, 25, 0.88);
             backdrop-filter: blur(16px);
-            border-radius: 48px;
-            border: 2px solid #a5d6a5;
-            position: relative;
-            z-index: 1;
             display: flex;
             flex-direction: column;
             overflow: hidden;
         }
-        /* Контент внутри приложения - скролл только внутри */
         .app-content {
             flex: 1;
             padding: 16px 14px 20px;
             overflow-y: auto;
         }
-        /* Верхняя панель: ник, баланс, меню */
         .top-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 20px;
             background: #0a2f1a;
             border-radius: 60px;
@@ -103,28 +48,30 @@
         .player-name {
             background: #1a4a2a;
             border-radius: 60px;
-            padding: 8px 16px;
+            padding: 8px 12px;
             color: #f5e6d3;
             font-weight: bold;
             border: 1px solid #6fbf4c;
-            max-width: 130px;
+            max-width: 120px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            font-size: 0.85rem;
-            text-align: center;
+            font-size: 0.8rem;
         }
         .balance-header {
             display: flex;
             align-items: baseline;
             gap: 6px;
             background: #1a4a2a;
-            padding: 5px 16px;
+            padding: 5px 14px;
             border-radius: 60px;
             border: 1px solid #6fbf4c;
         }
-        .balance-header span:first-child { font-size: 1.2rem; }
-        .balance-value { font-size: 1.3rem; font-weight: 800; color: #f5e6d3; }
+        .balance-value {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #f5e6d3;
+        }
         .menu-btn {
             background: #1a4a2a;
             border: 1px solid #6fbf4c;
@@ -138,7 +85,6 @@
             font-size: 1.3rem;
             color: #f5e6d3;
         }
-        /* Боковое меню */
         .sidebar {
             position: fixed;
             top: 0;
@@ -182,15 +128,11 @@
         .overlay.open { display: block; }
         .tab-content { display: none; }
         .tab-content.active-tab { display: block; }
-        /* Центрирование контента внутри вкладок */
-        .clicker-area { display: flex; justify-content: center; margin: 10px 0 12px; }
+        .clicker-area { display: flex; justify-content: center; margin: 10px 0; }
         .mega-clicker {
             width: 70vw;
             height: 70vw;
             max-width: 260px;
-            max-height: 260px;
-            min-width: 200px;
-            min-height: 200px;
             background: radial-gradient(circle at 35% 30%, #7cb342, #2e7d32);
             border-radius: 50%;
             display: flex;
@@ -205,173 +147,161 @@
         }
         .mega-clicker:active { transform: scale(0.96); }
         .click-icon { font-size: 4rem; margin-bottom: 8px; pointer-events: none; }
-        .click-power-info { background: #0a2f1a; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; color: #a5d6a5; text-align: center; display: inline-block; margin-top: 8px; }
-        .upgrades-grid { display: flex; flex-direction: column; gap: 12px; max-height: 55vh; overflow-y: auto; padding-right: 4px; }
+        .click-power-info { background: #0a2f1a; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; color: #a5d6a5; display: inline-block; margin-top: 8px; }
+        .upgrades-grid { display: flex; flex-direction: column; gap: 12px; max-height: 55vh; overflow-y: auto; }
         .upgrade-card { background: #1a4a2a; border-radius: 28px; padding: 10px 12px; border: 1px solid #6fbf4c; }
-        .upgrade-title { font-size: 0.9rem; font-weight: bold; color: #f5e6d3; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 5px; }
-        .upgrade-stats { font-size: 0.7rem; color: #c8e6c9; margin: 5px 0; display: flex; gap: 12px; flex-wrap: wrap; }
-        .multibuy-panel { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 2px; }
-        .multibtn { background: #2d6a1f; border: none; padding: 6px 10px; border-radius: 40px; font-weight: bold; font-size: 0.7rem; cursor: pointer; color: #f5e6d3; flex: 1; min-width: 40px; }
-        .price-tag { background: #0a2f1a; padding: 3px 10px; border-radius: 30px; font-size: 0.7rem; color: #a5d6a5; }
-        .level-progress { background: #2d6a1f; border-radius: 20px; height: 6px; width: 100%; margin: 6px 0; overflow: hidden; }
-        .level-fill { background: #6fbf4c; height: 100%; }
+        .upgrade-title { font-size: 0.9rem; font-weight: bold; color: #f5e6d3; display: flex; justify-content: space-between; flex-wrap: wrap; }
+        .multibuy-panel { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+        .multibtn { background: #2d6a1f; border: none; padding: 6px 10px; border-radius: 40px; font-weight: bold; font-size: 0.7rem; cursor: pointer; color: #f5e6d3; flex: 1; }
+        .price-tag { background: #0a2f1a; padding: 3px 10px; border-radius: 30px; font-size: 0.7rem; }
+        .auction-panel { background: #1a4a2a; border-radius: 32px; padding: 16px; margin-bottom: 16px; }
+        .auction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .auction-timer {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #ffd966;
+            flex: 1;
+        }
+        .refresh-auction-btn {
+            background: #2d6a1f;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 16px;
+            color: #a5d6a5;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+        .lot-card { background: #2d6a1f; border-radius: 28px; padding: 12px; margin-bottom: 12px; border: 1px solid #6fbf4c; }
+        .lot-name { font-size: 1rem; font-weight: bold; color: #f5e6d3; }
+        .lot-desc { font-size: 0.75rem; color: #a5d6a5; margin: 4px 0; }
+        .lot-bid { display: flex; justify-content: space-between; align-items: center; margin-top: 8px; flex-wrap: wrap; gap: 8px; }
+        .lot-input { background: #0a2f1a; border: 1px solid #6fbf4c; border-radius: 40px; padding: 8px 12px; color: #f5e6d3; width: 130px; text-align: center; font-weight: bold; }
+        .bid-btn { background: #6fbf4c; border: none; border-radius: 40px; padding: 8px 16px; font-weight: bold; cursor: pointer; }
         .leaderboard { background: #1a4a2a; border-radius: 32px; padding: 16px; }
-        .leaderboard h3 { color: #f5e6d3; text-align: center; margin: 0 0 12px 0; font-size: 1rem; }
-        .leader-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+        .leader-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .refresh-leader-btn { background: #2d6a1f; border: none; padding: 6px 12px; border-radius: 40px; color: #a5d6a5; font-size: 0.7rem; cursor: pointer; }
         .leader-list { max-height: 55vh; overflow-y: auto; }
         .leader-row { display: flex; justify-content: space-between; padding: 10px 12px; border-bottom: 1px solid #6fbf4c; color: #c0e0c0; font-size: 0.85rem; }
         .leader-rank { font-weight: bold; color: #6fbf4c; width: 35px; }
-        .leader-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .leader-name { flex: 1; overflow: hidden; text-overflow: ellipsis; }
         .leader-score { font-weight: bold; color: #f5e6d3; }
-        .casino-panel { background: #1a4a2a; border-radius: 32px; padding: 16px; margin-bottom: 16px; text-align: center; }
-        .game-selector { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
-        .game-btn { background: #2d6a1f; border: none; padding: 10px 16px; border-radius: 40px; color: #f5e6d3; font-weight: bold; cursor: pointer; font-size: 0.8rem; flex: 1; min-width: 90px; }
-        .game-btn.active { background: #6fbf4c; color: #0a2f1a; }
-        .game-content { display: none; }
-        .game-content.active-game { display: block; }
-        .casino-numbers { display: flex; justify-content: center; gap: 15px; margin: 15px 0; align-items: center; flex-wrap: wrap; }
-        .number-card { background: #2d6a1f; padding: 12px 18px; border-radius: 30px; min-width: 70px; text-align: center; }
-        .number-value { font-size: 1.8rem; font-weight: bold; color: #f5e6d3; font-family: monospace; }
-        .slot-machine { display: flex; justify-content: center; gap: 12px; margin: 20px 0; flex-wrap: wrap; }
-        .slot-reel { background: #0a2f1a; border: 3px solid #6fbf4c; border-radius: 20px; padding: 12px; min-width: 65px; text-align: center; font-size: 2rem; }
-        .prediction-buttons { display: flex; gap: 12px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
-        .prediction-btn, .spin-btn { background: #6fbf4c; border: none; padding: 10px 20px; border-radius: 50px; font-weight: bold; cursor: pointer; color: #0a2f1a; font-size: 0.9rem; }
-        .color-buttons { display: flex; gap: 10px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
-        .color-btn { border: none; padding: 10px 18px; border-radius: 50px; font-weight: bold; cursor: pointer; font-size: 0.8rem; }
-        .red-btn { background: #dc3545; color: white; }
-        .black-btn { background: #2c2c2c; color: white; }
-        .green-btn { background: #28a745; color: white; }
-        .bet-controls { display: flex; gap: 10px; justify-content: center; margin: 15px 0; flex-wrap: wrap; }
-        .bet-input { background: #0a2f1a; border: 2px solid #6fbf4c; padding: 10px; border-radius: 50px; color: #f5e6d3; text-align: center; width: 110px; font-size: 0.9rem; }
-        .play-btn { background: #2d6a1f; border: none; padding: 10px 20px; border-radius: 50px; color: #f5e6d3; cursor: pointer; font-weight: bold; }
-        .casino-status { margin-top: 15px; padding: 10px; border-radius: 40px; font-weight: bold; text-align: center; font-size: 0.8rem; }
-        .waiting { background: #2d6a1f; color: #f5e6d3; }
-        .win { background: #2a6b2a; color: #aaffaa; }
-        .lose { background: #8b3a3a; color: #ffaaaa; }
-        .income-badge { background: #0a2f1a; border-radius: 40px; padding: 6px 12px; text-align: center; margin-bottom: 12px; font-size: 0.75rem; color: #a5d6a5; }
+        .inventory-grid { display: flex; flex-direction: column; gap: 10px; max-height: 55vh; overflow-y: auto; }
+        .active-booster-card {
+            background: #2d6a1f;
+            border-radius: 28px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border: 2px solid #ffd966;
+        }
+        .booster-card { background: #2d6a1f; border-radius: 28px; padding: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .use-booster-btn { background: #6fbf4c; border: none; border-radius: 40px; padding: 6px 16px; font-weight: bold; cursor: pointer; }
         .sync-btn { background: #2d6a1f; border: none; padding: 12px; border-radius: 60px; color: #f5e6d3; font-weight: bold; width: 100%; margin-top: 16px; cursor: pointer; }
+        .income-badge { background: #0a2f1a; border-radius: 40px; padding: 6px; text-align: center; margin-bottom: 12px; }
         .settings-panel { background: #1a4a2a; border-radius: 32px; padding: 16px; margin-top: 16px; }
-        .settings-row { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #6fbf4c; }
+        .settings-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #6fbf4c; }
         .settings-label { color: #f5e6d3; font-weight: bold; font-size: 0.85rem; }
         .toggle-group { display: flex; background: #0a2f1a; border-radius: 40px; padding: 3px; gap: 4px; }
         .toggle-option { padding: 5px 10px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; cursor: pointer; color: #a5d6a5; background: transparent; border: none; }
         .toggle-option.active { background: #6fbf4c; color: #0a2f1a; }
-        .danger-btn { background: #6b2a3a; border: none; padding: 12px; border-radius: 40px; color: #ffaaaa; font-weight: bold; cursor: pointer; width: 100%; margin-top: 8px; font-size: 0.85rem; }
-        .bonus-card { background: #2d6a1f; border-radius: 28px; padding: 20px; text-align: center; margin: 16px 0; }
-        .bonus-amount { font-size: 1.8rem; font-weight: bold; color: #f5e6d3; margin: 10px 0; }
-        .bonus-timer { font-size: 1rem; color: #a5d6a5; margin: 10px 0; }
-        .bonus-btn { background: #6fbf4c; border: none; padding: 12px 24px; border-radius: 50px; font-weight: bold; font-size: 1rem; cursor: pointer; width: 100%; }
+        .danger-btn { background: #6b2a3a; border: none; padding: 12px; border-radius: 40px; color: #ffaaaa; font-weight: bold; width: 100%; cursor: pointer; margin-top: 8px; }
+        .bonus-card { background: #2d6a1f; border-radius: 28px; padding: 20px; margin-bottom: 16px; }
+        .bonus-title { font-size: 1.1rem; font-weight: bold; color: #ffd966; margin-bottom: 8px; }
+        .bonus-name { font-size: 1rem; font-weight: bold; color: #f5e6d3; margin: 8px 0; }
+        .bonus-timer { font-size: 0.9rem; color: #a5d6a5; margin: 8px 0; }
+        .bonus-btn { background: #6fbf4c; border: none; padding: 10px; border-radius: 60px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 5px; }
         .bonus-btn:disabled { opacity: 0.5; cursor: not-allowed; }
         .floating-number { position: fixed; pointer-events: none; font-weight: bold; font-size: 1.2rem; color: #f5e6d3; z-index: 1000; animation: floatUp 0.5s forwards; }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0px); } 100% { opacity: 0; transform: translateY(-70px); } }
+        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0); } 100% { opacity: 0; transform: translateY(-70px); } }
         .floating { position: fixed; bottom: 20px; left: 20px; right: 20px; background: #2d6a1f; color: #f5e6d3; padding: 12px; border-radius: 60px; text-align: center; z-index: 1000; animation: fadeOut 2s forwards; font-size: 0.85rem; }
         @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
         .loading { text-align: center; padding: 20px; color: #a5d6a5; }
-        .last-updated { font-size: 0.6rem; text-align: center; margin-top: 8px; color: #a5d6a5; }
-        .text-center { text-align: center; }
+        .pin-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.92); backdrop-filter: blur(12px); display: flex; justify-content: center; align-items: center; z-index: 2000; }
+        .pin-modal-content { background: #1a4a2a; border-radius: 56px; padding: 30px; text-align: center; max-width: 320px; width: 90%; border: 3px solid #a5d6a5; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; appearance: textfield; }
     </style>
 </head>
 <body>
-<div id="registerModal" class="modal">
-    <div class="modal-content">
-        <h2>🥑 Введите ваш ник</h2>
-        <input type="text" id="nicknameInput" maxlength="20" placeholder="Лесной странник" autocomplete="off">
-        <button id="startGameBtn">Войти в лес</button>
-        <div id="regError" class="error-msg"></div>
+<div id="registerModal" class="pin-modal">
+    <div class="pin-modal-content">
+        <h2 style="color:#f5e6d3;margin-bottom:20px;">Введите ваш ник</h2>
+        <input type="text" id="nicknameInput" maxlength="20" placeholder="Игрок" style="width:100%;padding:14px;border-radius:60px;border:none;background:#2d6a1f;color:#f5e6d3;font-size:1.1rem;text-align:center;margin-bottom:20px;">
+        <button id="startGameBtn" style="background:#6fbf4c;border:none;padding:12px 28px;border-radius:60px;font-weight:bold;font-size:1.1rem;cursor:pointer;width:100%;color:#1a4a2a;">Войти</button>
+        <div id="regError" style="color:#ffb3b3;margin-top:10px;"></div>
     </div>
 </div>
 
-<div class="app" id="gameApp" style="display: none;">
+<div class="app" id="gameApp" style="display:none;">
     <div class="app-content">
         <div class="top-bar">
             <div class="player-name" id="playerNameDisplay">Игрок</div>
-            <div class="balance-header">
-                <span>🥑</span>
-                <span class="balance-value" id="balansDisplay">0</span>
-            </div>
+            <div class="balance-header"><span>🥑</span><span class="balance-value" id="balansDisplay">0</span></div>
             <div class="menu-btn" id="menuBtn">☰</div>
         </div>
-
         <div id="clickTab" class="tab-content active-tab">
             <div class="clicker-area"><div class="mega-clicker" id="clickBomb"><div class="click-icon">🥑</div><div class="click-power-info" id="powerInfo">Сила: 1</div></div></div>
         </div>
-
         <div id="upgradesTab" class="tab-content">
             <div class="income-badge" id="totalIncomeDisplay">Пассивный доход: 0/сек</div>
             <div class="upgrades-grid" id="allUpgradesContainer"></div>
         </div>
-
-        <div id="casinoTab" class="tab-content">
-            <div class="casino-panel">
-                <div class="game-selector">
-                    <button class="game-btn" data-game="guess">🎲 БОЛЬШЕ/МЕНЬШЕ</button>
-                    <button class="game-btn" data-game="color">🎨 КРАСНОЕ/ЧЁРНОЕ</button>
-                    <button class="game-btn active" data-game="slots">🎰 АВТОМАТ</button>
+        <div id="auctionTab" class="tab-content">
+            <div class="auction-panel">
+                <div class="auction-header">
+                    <div class="auction-timer" id="auctionTimer">Загрузка...</div>
+                    <button class="refresh-auction-btn" id="refreshAuctionBtn">Обновить</button>
                 </div>
-                <div id="guessGame" class="game-content">
-                    <div class="casino-numbers"><div class="number-card"><div class="number-value" id="firstNum">?</div></div><span>⚖️</span><div class="number-card"><div class="number-value" id="secondNum">?</div></div></div>
-                    <div class="bet-controls"><input type="number" id="guessBet" class="bet-input" value="100" step="100" min="1"><button class="play-btn" id="startGuessBtn">ИГРАТЬ</button></div>
-                    <div class="prediction-buttons" id="guessPredictionBtns" style="display:none;"><button class="prediction-btn" id="lessBtn">МЕНЬШЕ</button><button class="prediction-btn" id="moreBtn">БОЛЬШЕ</button></div>
-                    <div id="guessStatus" class="casino-status waiting">Нажмите «ИГРАТЬ»</div>
-                </div>
-                <div id="colorGame" class="game-content">
-                    <div class="text-center" style="margin:10px 0;">🎡 Вращение рулетки</div>
-                    <div class="text-center" style="margin:10px 0; font-size:1.8rem;" id="rouletteResult">❓</div>
-                    <div class="color-buttons"><button class="color-btn red-btn" id="redBtn">КРАСНОЕ (x2)</button><button class="color-btn black-btn" id="blackBtn">ЧЁРНОЕ (x2)</button><button class="color-btn green-btn" id="greenBtn">ЗЕЛЁНОЕ (x14)</button></div>
-                    <div class="bet-controls"><input type="number" id="colorBet" class="bet-input" value="100" step="100" min="1"></div>
-                    <div id="colorStatus" class="casino-status waiting">Выберите цвет</div>
-                </div>
-                <div id="slotsGame" class="game-content active-game">
-                    <div class="slot-machine"><div class="slot-reel" id="slot1">🥑</div><div class="slot-reel" id="slot2">🥑</div><div class="slot-reel" id="slot3">🥑</div></div>
-                    <div class="bet-controls"><input type="number" id="slotBet" class="bet-input" value="100" step="100" min="1"><button class="spin-btn" id="spinBtn">КРУТИТЬ</button></div>
-                    <div id="slotStatus" class="casino-status waiting">Ставка x10 при выигрыше, 🥑🥑🥑 = x50</div>
-                </div>
+                <div id="auctionLots"></div>
             </div>
         </div>
-
+        <div id="inventoryTab" class="tab-content">
+            <div class="auction-panel">
+                <h3 style="color:#f5e6d3;margin-bottom:16px;">Действующие бустеры</h3>
+                <div id="activeBoostersList" class="inventory-grid"></div>
+                <h3 style="color:#f5e6d3;margin:16px 0 12px;">Неиспользованные бустеры</h3>
+                <div id="inventoryList" class="inventory-grid"><div class="loading">Загрузка...</div></div>
+            </div>
+        </div>
         <div id="bonusTab" class="tab-content">
-            <div class="bonus-card"><h3 style="color:#f5e6d3; margin:0 0 10px;">🎁 ЕЖЕЧАСНЫЙ БОНУС</h3>
-            <div class="bonus-amount">50 000 🥑</div><div class="bonus-timer" id="bonusTimer">—</div>
-            <button class="bonus-btn" id="claimBonusBtn">ЗАБРАТЬ</button></div>
+            <div class="bonus-card">
+                <div class="bonus-title">Ежедневный бонус</div>
+                <div class="bonus-name" id="dailyBonusName">Случайный бустер</div>
+                <div class="bonus-timer" id="dailyBonusTimer">—</div>
+                <button class="bonus-btn" id="claimDailyBonusBtn">Забрать</button>
+            </div>
+            <div class="bonus-card">
+                <div class="bonus-title">Ежечасный бонус</div>
+                <div class="bonus-name">50 000 монет</div>
+                <div class="bonus-timer" id="hourlyBonusTimer">—</div>
+                <button class="bonus-btn" id="claimHourlyBonusBtn">Забрать</button>
+            </div>
         </div>
-
         <div id="leaderTab" class="tab-content">
-            <div class="leaderboard"><div class="leader-header"><h3>ТАБЛИЦА ЛИДЕРОВ</h3><button class="refresh-leader-btn" id="refreshLeaderBtn">ОБНОВИТЬ</button></div>
-            <div class="leader-list" id="leaderList"><div class="loading">Загрузка...</div></div>
-            <div class="last-updated" id="lastUpdated">—</div><button class="sync-btn" id="syncBtn">СОХРАНИТЬ ПРОГРЕСС</button></div>
+            <div class="leaderboard"><div class="leader-header"><h3>Таблица лидеров</h3><button class="refresh-leader-btn" id="refreshLeaderBtn">Обновить</button></div><div class="leader-list" id="leaderList"><div class="loading">Загрузка...</div></div><div class="last-updated" id="lastUpdated" style="font-size:0.6rem;text-align:center;margin-top:8px;">—</div><button class="sync-btn" id="syncBtn">Сохранить прогресс</button></div>
         </div>
-
         <div id="settingsTab" class="tab-content">
             <div class="settings-panel">
-                <div class="settings-row"><span class="settings-label">🕐 Автосохранение</span>
-                    <div class="toggle-group" id="autoSaveGroup">
-                        <button data-value="0" class="toggle-option">Нет</button>
-                        <button data-value="1" class="toggle-option">1м</button>
-                        <button data-value="3" class="toggle-option active">3м</button>
-                        <button data-value="5" class="toggle-option">5м</button>
-                    </div>
-                </div>
-                <div class="settings-row"><span class="settings-label">🔄 Обновление таблицы</span>
-                    <div class="toggle-group" id="autoRefreshGroup">
-                        <button data-value="0" class="toggle-option">Нет</button>
-                        <button data-value="1" class="toggle-option">1м</button>
-                        <button data-value="3" class="toggle-option active">3м</button>
-                        <button data-value="5" class="toggle-option">5м</button>
-                    </div>
-                </div>
-                <button id="fullResetBtn" class="danger-btn">⚠️ ПОЛНЫЙ СБРОС (удалить всё)</button>
+                <div class="settings-row"><span class="settings-label">Автосохранение</span><div class="toggle-group" id="autoSaveGroup"><button data-value="0" class="toggle-option">Нет</button><button data-value="3" class="toggle-option active">3м</button></div></div>
+                <button id="fullResetBtn" class="danger-btn">Полный сброс</button>
             </div>
         </div>
     </div>
-
     <div id="sidebar" class="sidebar">
-        <button class="tab-btn active" data-tab="clickTab">КЛИКЕР</button>
-        <button class="tab-btn" data-tab="upgradesTab">УЛУЧШЕНИЯ</button>
-        <button class="tab-btn" data-tab="casinoTab">КАЗИНО</button>
-        <button class="tab-btn" data-tab="bonusTab">БОНУС</button>
-        <button class="tab-btn" data-tab="leaderTab">ЛИДЕРЫ</button>
-        <button class="tab-btn" data-tab="settingsTab">НАСТРОЙКИ</button>
+        <button class="tab-btn active" data-tab="clickTab">Кликер</button>
+        <button class="tab-btn" data-tab="upgradesTab">Улучшения</button>
+        <button class="tab-btn" data-tab="auctionTab">Аукцион</button>
+        <button class="tab-btn" data-tab="inventoryTab">Инвентарь</button>
+        <button class="tab-btn" data-tab="bonusTab">Бонус</button>
+        <button class="tab-btn" data-tab="leaderTab">Лидеры</button>
+        <button class="tab-btn" data-tab="settingsTab">Настройки</button>
     </div>
     <div id="overlay" class="overlay"></div>
 </div>
@@ -379,24 +309,30 @@
 <script>
     const BIN_ID = "6a0485ac250b1311c344dc9e";
     const API_KEY = "$2a$10$my.qCD0x0BIW5ej4vxtLF.IoXo3AJq6R5uhspSb1ZfvAeAu7UFHby";
-    let currentPlayer = null, balansCoins = 0, isGameBlocked = false, autoSaveIntervalId = null, autoRefreshIntervalId = null, lastBonusTime = 0;
+    const AUCTION_KEY = "main_auction";
     
-    const clickUpgrades = [
+    let currentPlayer = null, balansCoins = 0;
+    let activeBooster = null, boosterEndTime = 0;
+    let auctionLots = [], auctionEndTime = null;
+    let lastDailyBonus = 0, lastHourlyBonus = 0;
+    let inventoryBoosters = []; // { mult, duration }
+    
+    let clickUpgrades = [
         { id: "c1", name: "Усиленный палец", basePrice: 12, bonus: 1, level: 0, maxLvl: 50 },
         { id: "c2", name: "Молниеносный тап", basePrice: 90, bonus: 2, level: 0, maxLvl: 30 },
         { id: "c3", name: "Гипертап", basePrice: 380, bonus: 5, level: 0, maxLvl: 15 },
         { id: "c4", name: "Длань Бога", basePrice: 1500, bonus: 12, level: 0, maxLvl: Infinity },
         { id: "c5", name: "Кибер-импульс", basePrice: 5500, bonus: 28, level: 0, maxLvl: Infinity }
     ];
-    const incomeUpgrades = [
+    let incomeUpgrades = [
         { id: "i1", name: "Мелкая ферма", basePrice: 55, income: 1, level: 0, maxLvl: 100 },
         { id: "i2", name: "Авто-тапёр", basePrice: 320, income: 4, level: 0, maxLvl: 100 },
         { id: "i3", name: "Робо-ферма", basePrice: 1800, income: 12, level: 0, maxLvl: 100 },
         { id: "i4", name: "Кристальный ген.", basePrice: 7800, income: 35, level: 0, maxLvl: Infinity },
         { id: "i5", name: "Нейросетевой банк", basePrice: 32000, income: 95, level: 0, maxLvl: Infinity }
     ];
-    
-    function getClickPower() { let b=0; for(let u of clickUpgrades) b+=u.level*u.bonus; return 1+b; }
+
+    function getClickPower() { let bonus = (activeBooster && Date.now() < boosterEndTime) ? activeBooster.multiplier - 1 : 0; for(let u of clickUpgrades) bonus += u.level * u.bonus; return 1 + bonus; }
     function getTotalIncome() { let t=0; for(let u of incomeUpgrades) t+=u.level*u.income; return t; }
     function getClickPrice(up) { if(up.level>=up.maxLvl) return Infinity; let p=Math.floor(up.basePrice+up.level*up.basePrice*0.6); if(up.id==="c1") return Math.min(p,38000); if(up.id==="c2") return Math.min(p,120000); if(up.id==="c3") return Math.min(p,280000); return Math.min(p,2500000); }
     function getIncomePrice(up) { if(up.level>=up.maxLvl) return Infinity; let mult=1+(up.level/25); let p=Math.floor(up.basePrice*Math.pow(mult,1.4)); if(up.id==="i1"||up.id==="i2"||up.id==="i3") return Math.min(p,950000); return Math.min(p,5000000); }
@@ -417,13 +353,13 @@
         for(let up of clickUpgrades){
             const price=getClickPrice(up); const maxed=up.level>=up.maxLvl; const maxShow=up.maxLvl===Infinity?"∞":up.maxLvl; const percent=up.maxLvl===Infinity?0:(up.level/up.maxLvl)*100;
             const card=document.createElement("div"); card.className="upgrade-card";
-            card.innerHTML=`<div class="upgrade-title"><span>${up.name} [${up.level}/${maxShow}]</span><span class="price-tag">${maxed?"MAX":Math.floor(price)}</span></div><div class="upgrade-stats"><span>+${up.bonus}/ур</span><span>бонус +${up.level*up.bonus}</span></div>${up.maxLvl!==Infinity?`<div class="level-progress"><div class="level-fill" style="width:${percent}%"></div></div>`:'<div>Безлимитный</div>'}<div class="multibuy-panel" data-id="${up.id}" data-type="click"></div>`;
+            card.innerHTML=`<div class="upgrade-title"><span>${up.name} [${up.level}/${maxShow}]</span><span class="price-tag">${maxed?"MAX":Math.floor(price)}</span></div><div class="upgrade-stats" style="font-size:0.7rem;color:#c8e6c9;margin:5px 0;"><span>+${up.bonus}/ур</span><span>бонус +${up.level*up.bonus}</span></div>${up.maxLvl!==Infinity?`<div class="level-progress" style="background:#2d6a1f;border-radius:20px;height:6px;margin:6px 0;"><div class="level-fill" style="background:#6fbf4c;height:100%;width:${percent}%"></div></div>`:'<div style="font-size:0.7rem;">Безлимитный</div>'}<div class="multibuy-panel" data-id="${up.id}" data-type="click"></div>`;
             container.appendChild(card);
         }
         for(let up of incomeUpgrades){
             const price=getIncomePrice(up); const maxed=up.level>=up.maxLvl; const maxShow=up.maxLvl===Infinity?"∞":up.maxLvl; const percent=up.maxLvl===Infinity?0:(up.level/up.maxLvl)*100;
             const card=document.createElement("div"); card.className="upgrade-card";
-            card.innerHTML=`<div class="upgrade-title"><span>${up.name} [${up.level}/${maxShow}]</span><span class="price-tag">${maxed?"MAX":Math.floor(price)}</span></div><div class="upgrade-stats"><span>+${up.income}/сек</span><span>даёт +${up.level*up.income}/сек</span></div>${up.maxLvl!==Infinity?`<div class="level-progress"><div class="level-fill" style="width:${percent}%"></div></div>`:'<div>Безлимитный</div>'}<div class="multibuy-panel" data-id="${up.id}" data-type="income"></div>`;
+            card.innerHTML=`<div class="upgrade-title"><span>${up.name} [${up.level}/${maxShow}]</span><span class="price-tag">${maxed?"MAX":Math.floor(price)}</span></div><div class="upgrade-stats" style="font-size:0.7rem;color:#c8e6c9;margin:5px 0;"><span>+${up.income}/сек</span><span>даёт +${up.level*up.income}/сек</span></div>${up.maxLvl!==Infinity?`<div class="level-progress" style="background:#2d6a1f;border-radius:20px;height:6px;margin:6px 0;"><div class="level-fill" style="background:#6fbf4c;height:100%;width:${percent}%"></div></div>`:'<div style="font-size:0.7rem;">Безлимитный</div>'}<div class="multibuy-panel" data-id="${up.id}" data-type="income"></div>`;
             container.appendChild(card);
         }
         document.querySelectorAll('.multibuy-panel').forEach(panel=>{
@@ -443,93 +379,304 @@
         document.getElementById("powerInfo").innerHTML = `Сила: ${getClickPower()}`;
         document.getElementById("totalIncomeDisplay").innerHTML = `Пассивный доход: ${getTotalIncome()}/сек`;
         renderUpgrades();
-        updateBonusUI();
+        renderInventory();
+        updateBonusesUI();
+        renderActiveBoosters();
     }
     
-    function showMessage(text, color) { const msg = document.createElement("div"); msg.className = "floating-number"; msg.innerText = text; msg.style.color = color; msg.style.left = window.innerWidth/2 - 60 + "px"; msg.style.top = window.innerHeight/2 - 40 + "px"; document.body.appendChild(msg); setTimeout(() => msg.remove(), 500); }
-    function showFloating(text, color) { let div = document.createElement("div"); div.className = "floating"; div.innerText = text; div.style.background = color; document.body.appendChild(div); setTimeout(() => div.remove(), 2000); }
+    function saveGameLocal() { if(currentPlayer) localStorage.setItem(`clicker_${currentPlayer}`, JSON.stringify({ coins: balansCoins, clickLvls: clickUpgrades.map(u=>u.level), incomeLvls: incomeUpgrades.map(u=>u.level), inventory: inventoryBoosters, activeBooster, boosterEndTime, lastDailyBonus, lastHourlyBonus })); }
+    function loadGameLocal() { if(!currentPlayer) return; let raw = localStorage.getItem(`clicker_${currentPlayer}`); if(raw) try{ let d=JSON.parse(raw); balansCoins=d.coins||0; if(d.clickLvls)d.clickLvls.forEach((v,i)=>clickUpgrades[i].level=v); if(d.incomeLvls)d.incomeLvls.forEach((v,i)=>incomeUpgrades[i].level=v); inventoryBoosters=d.inventory||[]; activeBooster=d.activeBooster||null; boosterEndTime=d.boosterEndTime||0; lastDailyBonus=d.lastDailyBonus||0; lastHourlyBonus=d.lastHourlyBonus||0; }catch(e){} }
     
-    async function loadLeaders() { try { let url = `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`; let res = await fetch(url, { headers: { "X-Master-Key": API_KEY } }); if (!res.ok) throw new Error(); let data = await res.json(); return data.record.leaders || []; } catch(e) { return []; } }
-    async function saveLeaders(leaders) { try { let url = `https://api.jsonbin.io/v3/b/${BIN_ID}`; let res = await fetch(url, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY }, body: JSON.stringify({ leaders: leaders }) }); return res.ok; } catch(e) { return false; } }
-    async function syncToLeaderboard() { if (!currentPlayer) return; let leaders = await loadLeaders(); let existing = leaders.find(l => l.name === currentPlayer); if (existing) existing.score = balansCoins; else leaders.push({ name: currentPlayer, score: balansCoins }); leaders.sort((a,b) => b.score - a.score); leaders = leaders.slice(0, 50); await saveLeaders(leaders); }
-    async function showLeaders() { let container = document.getElementById("leaderList"); let leaders = await loadLeaders(); if (!leaders || leaders.length === 0) { container.innerHTML = "<div class='loading'>Нет игроков</div>"; document.getElementById("lastUpdated").innerHTML = "Нет данных"; return; } leaders.sort((a,b) => b.score - a.score); container.innerHTML = ""; leaders.slice(0, 20).forEach((l, i) => { let row = document.createElement("div"); row.className = "leader-row"; let medal = i === 0 ? "🏆" : (i === 1 ? "🥈" : (i === 2 ? "🥉" : `${i+1}.`)); row.innerHTML = `<div class="leader-rank">${medal}</div><div class="leader-name">${escapeHtml(l.name)}</div><div class="leader-score">${Math.floor(l.score)} 🥑</div>`; container.appendChild(row); }); document.getElementById("lastUpdated").innerHTML = `Обновлено: ${new Date().toLocaleTimeString()}`; }
-    async function fullReset() { if (!currentPlayer) return; if (confirm("ПОЛНЫЙ СБРОС: баланс, улучшения, бонус и данные из таблицы лидеров будут удалены. Продолжить?")) { balansCoins = 0; clickUpgrades.forEach(u=>u.level=0); incomeUpgrades.forEach(u=>u.level=0); lastBonusTime = 0; localStorage.removeItem(`bonus_${currentPlayer}`); updateUI(); saveGameLocal(); let leaders = await loadLeaders(); leaders = leaders.filter(l => l.name !== currentPlayer); await saveLeaders(leaders); await showLeaders(); showFloating("Все данные сброшены", "#ffaa88"); } }
-    function escapeHtml(str) { return str.replace(/[&<>]/g, function(m){ if(m==='&') return '&amp;'; return m==='<' ? '&lt;' : '&gt;'; }); }
-    function saveGameLocal() { if (!currentPlayer) return; const save = { coins: balansCoins, clickLvls: clickUpgrades.map(u => u.level), incomeLvls: incomeUpgrades.map(u => u.level), lastBonus: lastBonusTime }; localStorage.setItem(`clicker_${currentPlayer}`, JSON.stringify(save)); }
-    function loadGameLocal() { if (!currentPlayer) return; const raw = localStorage.getItem(`clicker_${currentPlayer}`); if (!raw) { balansCoins = 0; clickUpgrades.forEach(u=>u.level=0); incomeUpgrades.forEach(u=>u.level=0); lastBonusTime = 0; return; } try { const data = JSON.parse(raw); balansCoins = data.coins || 0; if(data.clickLvls) data.clickLvls.forEach((v,i)=>clickUpgrades[i].level=v); if(data.incomeLvls) data.incomeLvls.forEach((v,i)=>incomeUpgrades[i].level=v); lastBonusTime = data.lastBonus || 0; } catch(e){} }
-    function updateBonusUI() { const now = Date.now(); const elapsed = now - lastBonusTime; const hoursLeft = Math.max(0, 3600000 - elapsed); const timerDiv = document.getElementById("bonusTimer"); const btn = document.getElementById("claimBonusBtn"); if (hoursLeft <= 0) { if (timerDiv) timerDiv.innerHTML = "✅ Бонус доступен!"; if (btn) btn.disabled = false; } else { const minutes = Math.floor(hoursLeft / 60000); const seconds = Math.floor((hoursLeft % 60000) / 1000); if (timerDiv) timerDiv.innerHTML = `⏰ Доступен через: ${minutes}:${seconds.toString().padStart(2,'0')}`; if (btn) btn.disabled = true; } }
-    function claimBonus() { const now = Date.now(); if (now - lastBonusTime >= 3600000) { balansCoins += 50000; lastBonusTime = now; saveGameLocal(); updateUI(); showFloating("🎁 Получено 50 000 🥑!", "#aaffaa"); } else showMessage("Бонус ещё не доступен!", "#ff8888"); }
-    function setupAutoSave(value) { if (autoSaveIntervalId) clearInterval(autoSaveIntervalId); if (value > 0) autoSaveIntervalId = setInterval(() => { if (currentPlayer) syncToLeaderboard(); }, value * 60 * 1000); }
-    function setupAutoRefresh(value) { if (autoRefreshIntervalId) clearInterval(autoRefreshIntervalId); if (value > 0) autoRefreshIntervalId = setInterval(() => { showLeaders(); }, value * 60 * 1000); }
-    function saveSettingsToLocal() { if (!currentPlayer) return; const autoSave = document.querySelector("#autoSaveGroup .toggle-option.active")?.getAttribute("data-value") || "3"; const autoRefresh = document.querySelector("#autoRefreshGroup .toggle-option.active")?.getAttribute("data-value") || "3"; localStorage.setItem(`settings_${currentPlayer}`, JSON.stringify({ autoSave, autoRefresh })); }
-    function loadSettingsFromLocal() { if (!currentPlayer) return; const raw = localStorage.getItem(`settings_${currentPlayer}`); let autoSaveVal = 3, autoRefreshVal = 3; if (raw) try { const s = JSON.parse(raw); autoSaveVal = parseInt(s.autoSave); autoRefreshVal = parseInt(s.autoRefresh); } catch(e) {} document.querySelectorAll("#autoSaveGroup .toggle-option").forEach(opt => { opt.classList.remove("active"); if (parseInt(opt.getAttribute("data-value")) === autoSaveVal) opt.classList.add("active"); }); document.querySelectorAll("#autoRefreshGroup .toggle-option").forEach(opt => { opt.classList.remove("active"); if (parseInt(opt.getAttribute("data-value")) === autoRefreshVal) opt.classList.add("active"); }); setupAutoSave(autoSaveVal); setupAutoRefresh(autoRefreshVal); }
+    function showMessage(text, color) { let div = document.createElement("div"); div.className = "floating"; div.innerText = text; div.style.background = color; document.body.appendChild(div); setTimeout(()=>div.remove(),2000); }
     
-    function onTap(e) { e.preventDefault(); let gain = getClickPower(); if (Math.random() < 0.1) { gain *= 2; showMessage(`КРИТ! +${gain}`, "#ffaa66"); } else showMessage(`+${gain}`, "#a5d6a5"); balansCoins += gain; updateUI(); saveGameLocal(); }
-    function animateNumberSlot(element, duration = 2000) { return new Promise((resolve) => { let interval = setInterval(() => { let randomNum = Math.floor(Math.random() * 200) + 1; element.innerText = randomNum; }, 40); setTimeout(() => { clearInterval(interval); resolve(); }, duration); }); }
+    async function loadFullData() { try { let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": API_KEY } }); let data = await res.json(); return data.record; } catch(e) { return { leaders: [], auction: { lots: [], endTime: null } }; } }
+    async function saveFullData(leaders, auctionData) { await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY }, body: JSON.stringify({ leaders, auction: auctionData }) }); }
     
-    async function playSlots() { 
-        if(isGameBlocked){ showMessage("Подождите!","#ffaa88"); return; } 
-        let bet=parseInt(document.getElementById("slotBet").value); 
-        if(isNaN(bet)||bet<=0){ showMessage("Ставка > 0","#ff8888"); return; } 
-        if(bet>balansCoins){ showMessage("Не хватает монет!","#ff8888"); return; } 
-        isGameBlocked=true; 
-        let s1=document.getElementById("slot1"), s2=document.getElementById("slot2"), s3=document.getElementById("slot3"); 
-        let statusDiv=document.getElementById("slotStatus"); 
-        statusDiv.innerHTML="🎰 Крутим..."; 
-        const symbols=["🥑","🍃","🍂","🌰","🍎","🍐"];
-        let animInterval = setInterval(() => {
-            s1.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-            s2.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-            s3.innerText = symbols[Math.floor(Math.random() * symbols.length)];
-        }, 100);
-        await new Promise(resolve => setTimeout(resolve, 1000));
-        clearInterval(animInterval);
-        let r1=symbols[Math.floor(Math.random()*symbols.length)];
-        let r2=symbols[Math.floor(Math.random()*symbols.length)];
-        let r3=symbols[Math.floor(Math.random()*symbols.length)];
-        s1.innerText=r1; s2.innerText=r2; s3.innerText=r3;
-        let win=false, mult=0;
-        if(r1==="🥑" && r2==="🥑" && r3==="🥑"){ win=true; mult=50; statusDiv.innerHTML=`🥑🥑🥑 ДЖЕКПОТ! x50 🥑🥑🥑`; showMessage(`ДЖЕКПОТ! ${bet*50}`, "#ffaa66"); } 
-        else if(r1===r2 && r2===r3){ win=true; mult=10; statusDiv.innerHTML=`🎉 ТРИ ОДИНАКОВЫХ! x10 🎉`; showMessage(`x10! +${bet*10}`, "#aaffaa"); } 
-        else { statusDiv.innerHTML=`😭 ПРОИГРЫШ! -${bet}`; showMessage(`-${bet}`,"#ff8888"); } 
-        if(win){ balansCoins+=bet*mult; statusDiv.className="casino-status win"; } 
-        else { balansCoins-=bet; statusDiv.className="casino-status lose"; } 
-        updateUI(); saveGameLocal(); isGameBlocked=false; 
+    function getCurrentAuctionEndTime() {
+        let now = new Date();
+        let hour = now.getHours();
+        if(hour < 8 || hour >= 22) return null;
+        let startTime = new Date(now).setHours(hour, 0, 0, 0);
+        return startTime + 1200000;
     }
     
-    let guessGameActive=false, guessCurrentFirst, guessCurrentBet, waitingForPrediction=false;
-    function startGuessGame(){ if(guessGameActive||isGameBlocked){ showMessage("Завершите игру!","#ffaa88"); return; } let bet=parseInt(document.getElementById("guessBet").value); if(isNaN(bet)||bet<=0){ showMessage("Ставка > 0","#ff8888"); return; } if(bet>balansCoins){ showMessage("Не хватает монет!","#ff8888"); return; } guessCurrentBet=bet; guessGameActive=true; waitingForPrediction=true; guessCurrentFirst=Math.floor(Math.random()*51)+75; document.getElementById("firstNum").innerText=guessCurrentFirst; document.getElementById("secondNum").innerText="?"; document.getElementById("guessPredictionBtns").style.display="flex"; document.getElementById("startGuessBtn").style.display="none"; document.getElementById("guessStatus").className="casino-status waiting"; document.getElementById("guessStatus").innerHTML=`Первое: ${guessCurrentFirst}. Ставка: ${guessCurrentBet}`; }
-    async function makeGuessPrediction(prediction){ if(!guessGameActive||!waitingForPrediction||isGameBlocked) return; waitingForPrediction=false; isGameBlocked=true; document.getElementById("guessPredictionBtns").style.display="none"; let secondNumElement=document.getElementById("secondNum"); let statusDiv=document.getElementById("guessStatus"); statusDiv.innerHTML="Второе число..."; await animateNumberSlot(secondNumElement,2000); let finalSecondNum=Math.floor(Math.random()*200)+1; secondNumElement.innerText=finalSecondNum; let isWin=(prediction==='less' && finalSecondNum<guessCurrentFirst)||(prediction==='more' && finalSecondNum>guessCurrentFirst); if(isWin){ balansCoins+=guessCurrentBet; statusDiv.className="casino-status win"; statusDiv.innerHTML=`ПОБЕДА! +${guessCurrentBet}!`; showMessage(`+${guessCurrentBet}`,"#aaffaa"); } else { balansCoins-=guessCurrentBet; statusDiv.className="casino-status lose"; statusDiv.innerHTML=`ПРОИГРЫШ! -${guessCurrentBet}`; showMessage(`-${guessCurrentBet}`,"#ff8888"); } updateUI(); saveGameLocal(); guessGameActive=false; isGameBlocked=false; document.getElementById("startGuessBtn").style.display="block"; }
-    async function playColorGame(color){ if(isGameBlocked){ showMessage("Подождите!","#ffaa88"); return; } let bet=parseInt(document.getElementById("colorBet").value); if(isNaN(bet)||bet<=0){ showMessage("Ставка > 0","#ff8888"); return; } if(bet>balansCoins){ showMessage("Не хватает монет!","#ff8888"); return; } isGameBlocked=true; let statusDiv=document.getElementById("colorStatus"); let resultDiv=document.getElementById("rouletteResult"); statusDiv.innerHTML="Рулетка..."; await animateNumberSlot(resultDiv,2000); let result=Math.floor(Math.random()*15); let resultColor="", winAmount=0, emoji=""; if(result===0){ resultColor="green"; winAmount=bet*14; emoji="🟢 0"; } else if(result<=7){ resultColor="red"; winAmount=bet; emoji="🔴 "+result; } else { resultColor="black"; winAmount=bet; emoji="⚫ "+result; } resultDiv.innerText=emoji; if(color===resultColor){ balansCoins+=winAmount; statusDiv.className="casino-status win"; statusDiv.innerHTML=`ПОБЕДА! +${winAmount}`; showMessage(`+${winAmount}`,"#aaffaa"); } else { balansCoins-=bet; statusDiv.className="casino-status lose"; statusDiv.innerHTML=`ПРОИГРЫШ! -${bet}`; showMessage(`-${bet}`,"#ff8888"); } updateUI(); saveGameLocal(); isGameBlocked=false; }
+    function getNextAuctionStart() {
+        let now = new Date();
+        let hour = now.getHours();
+        if(hour < 8) return new Date(now).setHours(8, 0, 0, 0);
+        if(hour >= 22) return new Date(now).setHours(8, 0, 0, 0) + 86400000;
+        return new Date(now).setHours(hour, 0, 0, 0);
+    }
     
-    let passiveInterval=null;
-    function startPassive(){ if(passiveInterval) clearInterval(passiveInterval); passiveInterval=setInterval(()=>{ let inc=getTotalIncome(); if(inc>0){ balansCoins+=inc; updateUI(); saveGameLocal(); } },1000); }
+    function generateStartPrice(mult, duration, isRandom = false) {
+        if(isRandom) return 50000000;
+        return mult * duration * 100000;
+    }
+    function generateMinBid(mult, duration, isRandom = false) {
+        if(isRandom) return 1000000;
+        return mult * duration * 500;
+    }
+    
+    async function loadAuction() {
+        let data = await loadFullData();
+        auctionLots = data.auction?.lots || [];
+        auctionEndTime = data.auction?.endTime || null;
+        let now = Date.now();
+        let hour = new Date().getHours();
+        let isAuctionTime = (hour >= 8 && hour < 22);
+        let currentEnd = getCurrentAuctionEndTime();
+        if(auctionEndTime && now >= auctionEndTime) { auctionLots = []; auctionEndTime = null; await saveAuction(); }
+        if((!auctionLots.length || !auctionEndTime) && isAuctionTime && currentEnd) {
+            auctionLots = generateAuctionLots();
+            auctionEndTime = currentEnd;
+            await saveAuction();
+        }
+        renderAuction();
+    }
+    
+    function generateAuctionLots() {
+        let lots = [];
+        let boosters = [
+            { mult: 2, durations: [5,10,30,60] }, { mult: 3, durations: [5,10,15,30] },
+            { mult: 5, durations: [5,10,15] }, { mult: 10, durations: [5,10] }
+        ];
+        for(let i=0; i<2; i++) {
+            let b = boosters[Math.floor(Math.random()*boosters.length)];
+            let duration = b.durations[Math.floor(Math.random()*b.durations.length)];
+            let startPrice = generateStartPrice(b.mult, duration, false);
+            lots.push({ id: Date.now()+i, type: "exact", mult: b.mult, duration: duration, currentBid: startPrice, currentBidder: null, endTime: Date.now() + 1200000, closed: false });
+        }
+        let randomMult = Math.floor(Math.random() * 100) + 5;
+        if(randomMult>200) randomMult=200;
+        let randomDuration = [5,10,15][Math.floor(Math.random()*3)];
+        lots.push({ id: Date.now()+99, type: "random", mult: randomMult, duration: randomDuration, currentBid: 50000000, currentBidder: null, endTime: Date.now() + 1200000, closed: false });
+        return lots;
+    }
+    
+    async function saveAuction() { let leaders = await loadLeaders(); await saveFullData(leaders, { lots: auctionLots, endTime: auctionEndTime }); }
+    
+    async function placeBid(lotId, bidAmount) {
+        let lot = auctionLots.find(l=>l.id==lotId);
+        if(!lot || lot.closed) { showMessage("Лот завершён!", "#ff8888"); return; }
+        if(!auctionEndTime || Date.now() >= auctionEndTime) { showMessage("Аукцион завершён!", "#ff8888"); return; }
+        let isRandom = (lot.type === 'random');
+        let minBid = lot.currentBid + generateMinBid(lot.mult, lot.duration, isRandom);
+        if(bidAmount < minBid) { showMessage(`Минимальная ставка ${minBid}`, "#ff8888"); return; }
+        if(bidAmount > balansCoins) { showMessage("Не хватает монет!", "#ff8888"); return; }
+        let commission = Math.floor(bidAmount * 0.03);
+        let totalCost = bidAmount + commission;
+        if(totalCost > balansCoins) { showMessage(`Не хватает на комиссию 3% (${commission})`, "#ff8888"); return; }
+        if(lot.currentBidder && lot.currentBidder !== currentPlayer) {
+            let refund = lot.currentBid;
+            balansCoins += refund;
+            saveGameLocal();
+        }
+        balansCoins -= totalCost;
+        lot.currentBid = bidAmount;
+        lot.currentBidder = currentPlayer;
+        let timeLeft = lot.endTime - Date.now();
+        if(timeLeft < 60000) lot.endTime = Date.now() + 60000;
+        else lot.endTime = Date.now() + 60000;
+        await saveAuction();
+        updateUI();
+        showMessage(`Ставка ${bidAmount} принята! +1 минута`, "#aaffaa");
+    }
+    
+    function checkAuctionEnd() {
+        let now = Date.now();
+        let changed = false;
+        let hour = new Date().getHours();
+        let isAuctionTime = (hour >= 8 && hour < 22);
+        for(let lot of auctionLots) {
+            if(!lot.closed && lot.endTime <= now) {
+                lot.closed = true;
+                if(lot.currentBidder === currentPlayer) {
+                    inventoryBoosters.push({ mult: lot.mult, duration: lot.duration });
+                    saveGameLocal();
+                    showMessage(`Вы выиграли бустер x${lot.mult} на ${lot.duration} мин!`, "#aaffaa");
+                }
+                changed = true;
+            }
+        }
+        if(changed) { saveAuction(); renderAuction(); renderInventory(); }
+        if(auctionEndTime && now >= auctionEndTime) { auctionLots = []; auctionEndTime = null; saveAuction(); renderAuction(); }
+        let currentEnd = getCurrentAuctionEndTime();
+        if(isAuctionTime && (!auctionLots.length || !auctionEndTime) && currentEnd) {
+            auctionLots = generateAuctionLots();
+            auctionEndTime = currentEnd;
+            saveAuction();
+            renderAuction();
+        }
+        renderAuction();
+        let nextStart = getNextAuctionStart();
+        let timeUntilNext = nextStart - now;
+        let hours = Math.floor(timeUntilNext / 3600000);
+        let minutes = Math.floor((timeUntilNext % 3600000) / 60000);
+        if(isAuctionTime && auctionLots.length > 0 && auctionEndTime && now < auctionEndTime) {
+            let remaining = auctionEndTime - now;
+            let mins = Math.floor(remaining/60000);
+            let secs = Math.floor((remaining%60000)/1000);
+            document.getElementById("auctionTimer").innerHTML = `Аукцион до ${new Date(auctionEndTime).toLocaleTimeString()}`;
+        } else {
+            document.getElementById("auctionTimer").innerHTML = `Следующий аукцион через ${hours}ч ${minutes}м`;
+        }
+    }
+    
+    function renderAuction() {
+        let container = document.getElementById("auctionLots");
+        if(!container) return;
+        let hour = new Date().getHours();
+        let isAuctionTime = (hour >= 8 && hour < 22);
+        if(!isAuctionTime || !auctionLots.length || (auctionEndTime && Date.now() >= auctionEndTime)) {
+            container.innerHTML = "<div class='loading'>Аукцион не активен</div>";
+            return;
+        }
+        if(!auctionLots.length) { container.innerHTML = "<div class='loading'>Аукцион скоро начнётся</div>"; return; }
+        container.innerHTML = "";
+        for(let lot of auctionLots) {
+            let timeLeft = Math.max(0, lot.endTime - Date.now());
+            let mins = Math.floor(timeLeft/60000);
+            let secs = Math.floor((timeLeft%60000)/1000);
+            let isRandom = (lot.type === 'random');
+            let minBid = lot.currentBid + generateMinBid(lot.mult, lot.duration, isRandom);
+            let div = document.createElement("div");
+            div.className = "lot-card";
+            div.innerHTML = `
+                <div class="lot-name">${isRandom ? 'СЛУЧАЙНЫЙ БУСТЕР' : `БУСТЕР x${lot.mult} на ${lot.duration} мин`}</div>
+                <div class="lot-desc">💰 Текущая ставка: ${Math.floor(lot.currentBid)} | 👤 ${lot.currentBidder||'нет ставок'}</div>
+                <div class="lot-desc">📈 Минимальная следующая ставка: ${Math.floor(minBid)}</div>
+                <div class="lot-bid"><span>⏱️ ${mins}:${secs.toString().padStart(2,'0')}</span>
+                ${!lot.closed && currentPlayer ? `<div style="display:flex;gap:8px;"><input type="number" id="bid_${lot.id}" class="lot-input" placeholder="ставка" value="${Math.floor(minBid)}" step="${isRandom ? 1000000 : (lot.mult * lot.duration * 500)}" min="${Math.floor(minBid)}"><button class="bid-btn" onclick="window.placeBid(${lot.id}, parseInt(document.getElementById('bid_${lot.id}').value))">Повысить</button></div>` : (lot.closed ? '<span>✅ Завершён</span>' : '')}
+                </div>
+            `;
+            container.appendChild(div);
+        }
+    }
+    
+    function renderActiveBoosters() {
+        let container = document.getElementById("activeBoostersList");
+        if(!container) return;
+        if(activeBooster && Date.now() < boosterEndTime) {
+            let timeLeft = Math.max(0, boosterEndTime - Date.now());
+            let mins = Math.floor(timeLeft/60000);
+            let secs = Math.floor((timeLeft%60000)/1000);
+            container.innerHTML = `<div class="active-booster-card"><span>⚡ АКТИВЕН: x${activeBooster.multiplier}</span><br><span>⏱️ Осталось: ${mins}:${secs.toString().padStart(2,'0')}</span></div>`;
+        } else {
+            container.innerHTML = "<div class='loading'>Нет активных бустеров</div>";
+        }
+    }
+    
+    function renderInventory() {
+        let container = document.getElementById("inventoryList");
+        if(!container) return;
+        if(!inventoryBoosters.length) { container.innerHTML = "<div class='loading'>У вас нет бустеров</div>"; return; }
+        container.innerHTML = "";
+        for(let i=0; i<inventoryBoosters.length; i++) {
+            let b = inventoryBoosters[i];
+            let div = document.createElement("div");
+            div.className = "booster-card";
+            div.innerHTML = `<span>Бустер x${b.mult} на ${b.duration} мин</span><button class="use-booster-btn" onclick="window.useBooster(${i})">Использовать</button>`;
+            container.appendChild(div);
+        }
+    }
+    
+    window.useBooster = function(idx) {
+        let booster = inventoryBoosters[idx];
+        if(!booster) return;
+        activeBooster = { multiplier: booster.mult };
+        boosterEndTime = Date.now() + booster.duration * 60000;
+        inventoryBoosters.splice(idx,1);
+        saveGameLocal();
+        updateUI();
+        showMessage(`Активирован x${booster.mult} на ${booster.duration} мин!`, "#aaffaa");
+        renderInventory();
+        renderActiveBoosters();
+    };
+    window.placeBid = placeBid;
+    
+    function updateBonusesUI() {
+        let now = Date.now();
+        let dailyLeft = Math.max(0, 86400000 - (now - lastDailyBonus));
+        let dailyTimer = document.getElementById("dailyBonusTimer");
+        let dailyBtn = document.getElementById("claimDailyBonusBtn");
+        if (dailyLeft <= 0) {
+            let mult = (Math.random() < 0.5 ? 1.5 : 2).toFixed(1);
+            let duration = Math.floor(Math.random() * 7) + 1;
+            document.getElementById("dailyBonusName").innerHTML = `Бустер x${mult} на ${duration} мин`;
+            window.pendingDailyBonus = { mult: parseFloat(mult), duration: duration };
+            if(dailyTimer) dailyTimer.innerHTML = "✅ Бонус доступен!";
+            if(dailyBtn) dailyBtn.disabled = false;
+        } else {
+            let hours = Math.floor(dailyLeft / 3600000);
+            let minutes = Math.floor((dailyLeft % 3600000) / 60000);
+            if(dailyTimer) dailyTimer.innerHTML = `⏰ Доступен через: ${hours}ч ${minutes}м`;
+            if(dailyBtn) dailyBtn.disabled = true;
+        }
+        let hourlyLeft = Math.max(0, 3600000 - (now - lastHourlyBonus));
+        let hourlyTimer = document.getElementById("hourlyBonusTimer");
+        let hourlyBtn = document.getElementById("claimHourlyBonusBtn");
+        if (hourlyLeft <= 0) {
+            if(hourlyTimer) hourlyTimer.innerHTML = "✅ Бонус доступен!";
+            if(hourlyBtn) hourlyBtn.disabled = false;
+        } else {
+            let minutes = Math.floor(hourlyLeft / 60000);
+            let seconds = Math.floor((hourlyLeft % 60000) / 1000);
+            if(hourlyTimer) hourlyTimer.innerHTML = `⏰ Доступен через: ${minutes}:${seconds.toString().padStart(2,'0')}`;
+            if(hourlyBtn) hourlyBtn.disabled = true;
+        }
+    }
+    
+    function claimDailyBonus() {
+        let now = Date.now();
+        if (now - lastDailyBonus >= 86400000 && window.pendingDailyBonus) {
+            inventoryBoosters.push({ mult: window.pendingDailyBonus.mult, duration: window.pendingDailyBonus.duration });
+            lastDailyBonus = now;
+            saveGameLocal();
+            updateUI();
+            showMessage(`Получен бустер x${window.pendingDailyBonus.mult} на ${window.pendingDailyBonus.duration} мин!`, "#aaffaa");
+            updateBonusesUI();
+        } else { showMessage("Бонус ещё не доступен!", "#ff8888"); }
+    }
+    
+    function claimHourlyBonus() {
+        let now = Date.now();
+        if (now - lastHourlyBonus >= 3600000) {
+            balansCoins += 50000;
+            lastHourlyBonus = now;
+            saveGameLocal();
+            updateUI();
+            showMessage("Получено 50 000 монет!", "#aaffaa");
+            updateBonusesUI();
+        } else { showMessage("Бонус ещё не доступен!", "#ff8888"); }
+    }
+    
+    async function loadLeaders() { let data = await loadFullData(); return data.leaders || []; }
+    async function syncToLeaderboard() { let leaders = await loadLeaders(); let existing = leaders.find(l=>l.name===currentPlayer); if(existing) existing.score = balansCoins; else leaders.push({ name: currentPlayer, score: balansCoins }); leaders.sort((a,b)=>b.score-a.score); leaders=leaders.slice(0,50); await saveFullData(leaders, { lots: auctionLots, endTime: auctionEndTime }); }
+    async function showLeaders() { let leaders = await loadLeaders(); leaders.sort((a,b)=>b.score-a.score); let container = document.getElementById("leaderList"); if(!leaders.length) { container.innerHTML = "<div class='loading'>Нет игроков</div>"; return; } container.innerHTML = ""; leaders.slice(0,20).forEach((l,i)=>{ let row=document.createElement("div"); row.className="leader-row"; row.innerHTML=`<div class="leader-rank">${i===0?"🏆":i===1?"🥈":i===2?"🥉":i+1}</div><div class="leader-name">${l.name}</div><div class="leader-score">${Math.floor(l.score)} 🥑</div>`; container.appendChild(row); }); document.getElementById("lastUpdated").innerHTML = `Обновлено: ${new Date().toLocaleTimeString()}`; }
+    
+    function onTap(e) { e.preventDefault(); let gain = getClickPower(); if(Math.random()<0.1) gain*=2; balansCoins += gain; updateUI(); saveGameLocal(); }
+    function startPassive() { setInterval(()=>{ let inc = getTotalIncome(); if(inc>0){ balansCoins+=inc; updateUI(); saveGameLocal(); } },1000); }
     
     function initMenu() {
-        const menuBtn = document.getElementById("menuBtn"), sidebar = document.getElementById("sidebar"), overlay = document.getElementById("overlay");
-        function closeMenu() { sidebar.classList.remove("open"); overlay.classList.remove("open"); }
-        menuBtn.onclick = () => { sidebar.classList.add("open"); overlay.classList.add("open"); };
-        overlay.onclick = closeMenu;
-        document.querySelectorAll(".sidebar .tab-btn").forEach(btn => {
-            btn.onclick = (e) => {
-                let tabId = btn.getAttribute("data-tab");
+        let menuBtn=document.getElementById("menuBtn"), sidebar=document.getElementById("sidebar"), overlay=document.getElementById("overlay");
+        function close(){ sidebar.classList.remove("open"); overlay.classList.remove("open"); }
+        menuBtn.onclick=()=>{ sidebar.classList.add("open"); overlay.classList.add("open"); };
+        overlay.onclick=close;
+        document.querySelectorAll(".sidebar .tab-btn").forEach(btn=>{
+            btn.onclick=()=>{
+                let tabId=btn.getAttribute("data-tab");
                 document.querySelectorAll(".sidebar .tab-btn").forEach(b=>b.classList.remove("active"));
                 btn.classList.add("active");
                 document.querySelectorAll(".tab-content").forEach(c=>c.classList.remove("active-tab"));
                 document.getElementById(tabId).classList.add("active-tab");
-                closeMenu();
+                close();
                 if(tabId==="upgradesTab") renderUpgrades();
                 if(tabId==="leaderTab") showLeaders();
-                if(tabId==="bonusTab") updateBonusUI();
+                if(tabId==="auctionTab") { renderAuction(); checkAuctionEnd(); }
+                if(tabId==="inventoryTab") { renderInventory(); renderActiveBoosters(); }
+                if(tabId==="bonusTab") updateBonusesUI();
             };
         });
-    }
-    
-    function switchGame(gameId){
-        document.querySelectorAll(".game-content").forEach(el=>el.classList.remove("active-game"));
-        document.getElementById(gameId+"Game").classList.add("active-game");
-        document.querySelectorAll(".game-btn").forEach(btn=>btn.classList.remove("active"));
-        document.querySelector(`.game-btn[data-game="${gameId}"]`).classList.add("active");
     }
     
     function startGameWithNick(nick) {
@@ -537,7 +684,6 @@
         document.getElementById("playerNameDisplay").innerText = nick;
         loadGameLocal();
         updateUI();
-        loadSettingsFromLocal();
         document.getElementById("registerModal").style.display = "none";
         document.getElementById("gameApp").style.display = "block";
         let clicker = document.getElementById("clickBomb");
@@ -545,27 +691,35 @@
         startPassive();
         initMenu();
         showLeaders();
-        document.querySelectorAll(".game-btn").forEach(btn=>btn.addEventListener("click",()=>switchGame(btn.getAttribute("data-game"))));
-        document.getElementById("startGuessBtn")?.addEventListener("click",startGuessGame);
-        document.getElementById("lessBtn")?.addEventListener("click",()=>makeGuessPrediction('less'));
-        document.getElementById("moreBtn")?.addEventListener("click",()=>makeGuessPrediction('more'));
-        document.getElementById("redBtn")?.addEventListener("click",()=>playColorGame("red"));
-        document.getElementById("blackBtn")?.addEventListener("click",()=>playColorGame("black"));
-        document.getElementById("greenBtn")?.addEventListener("click",()=>playColorGame("green"));
-        document.getElementById("spinBtn")?.addEventListener("click",playSlots);
-        document.getElementById("syncBtn")?.addEventListener("click",async()=>{ await syncToLeaderboard(); showFloating("Сохранено!", "#2a6b4e"); });
-        document.getElementById("refreshLeaderBtn")?.addEventListener("click",()=>{ showLeaders(); showFloating("Обновлено!", "#3a6b6b"); });
-        document.getElementById("fullResetBtn")?.addEventListener("click",fullReset);
-        document.getElementById("claimBonusBtn")?.addEventListener("click",claimBonus);
-        document.querySelectorAll("#autoSaveGroup .toggle-option").forEach(opt => { opt.addEventListener("click", () => { document.querySelectorAll("#autoSaveGroup .toggle-option").forEach(o=>o.classList.remove("active")); opt.classList.add("active"); setupAutoSave(parseInt(opt.getAttribute("data-value"))); saveSettingsToLocal(); }); });
-        document.querySelectorAll("#autoRefreshGroup .toggle-option").forEach(opt => { opt.addEventListener("click", () => { document.querySelectorAll("#autoRefreshGroup .toggle-option").forEach(o=>o.classList.remove("active")); opt.classList.add("active"); setupAutoRefresh(parseInt(opt.getAttribute("data-value"))); saveSettingsToLocal(); }); });
-        setInterval(() => { updateBonusUI(); }, 1000);
+        loadAuction();
+        setInterval(()=>{ checkAuctionEnd(); }, 1000);
+        setInterval(()=>{ showLeaders(); }, 30000);
+        setInterval(()=>{ if(currentPlayer) syncToLeaderboard(); }, 180000);
+        document.getElementById("syncBtn")?.addEventListener("click",async()=>{ await syncToLeaderboard(); showMessage("Сохранено!","#2a6b4e"); });
+        document.getElementById("refreshLeaderBtn")?.addEventListener("click",()=>{ showLeaders(); showMessage("Обновлено!","#3a6b6b"); });
+        document.getElementById("refreshAuctionBtn")?.addEventListener("click",()=>{ loadAuction(); showMessage("Аукцион обновлён!","#3a6b6b"); });
+        document.getElementById("fullResetBtn")?.addEventListener("click",()=>{ if(confirm("Полный сброс?")){ balansCoins=0; clickUpgrades.forEach(u=>u.level=0); incomeUpgrades.forEach(u=>u.level=0); inventoryBoosters=[]; activeBooster=null; lastDailyBonus=0; lastHourlyBonus=0; saveGameLocal(); updateUI(); showMessage("Сброшено","#ffaa88"); } });
+        document.getElementById("claimDailyBonusBtn")?.addEventListener("click", claimDailyBonus);
+        document.getElementById("claimHourlyBonusBtn")?.addEventListener("click", claimHourlyBonus);
+        document.getElementById("autoSaveGroup")?.querySelectorAll(".toggle-option").forEach(opt=>{
+            opt.addEventListener("click",()=>{
+                document.querySelectorAll("#autoSaveGroup .toggle-option").forEach(o=>o.classList.remove("active"));
+                opt.classList.add("active");
+            });
+        });
     }
     
-    document.getElementById("startGameBtn")?.addEventListener("click",()=>{ let nick = document.getElementById("nicknameInput").value.trim(); if(!nick){ document.getElementById("regError").innerText="Введите ник!"; return; } if(nick.length>20){ document.getElementById("regError").innerText="Ник не длиннее 20 символов"; return; } localStorage.setItem("saved_nick", nick); startGameWithNick(nick); });
-    document.getElementById("nicknameInput")?.addEventListener("keypress",(e)=>{ if(e.key==="Enter") document.getElementById("startGameBtn").click(); });
+    const startBtn = document.getElementById("startGameBtn");
+    if (startBtn) {
+        startBtn.addEventListener("click", function() {
+            let nick = document.getElementById("nicknameInput").value.trim();
+            if(!nick){ document.getElementById("regError").innerText="Введите ник!"; return; }
+            localStorage.setItem("saved_nick", nick);
+            startGameWithNick(nick);
+        });
+    }
     let savedNick = localStorage.getItem("saved_nick");
-    if (savedNick) { document.getElementById("nicknameInput").value = savedNick; startGameWithNick(savedNick); }
+    if(savedNick){ document.getElementById("nicknameInput").value = savedNick; startGameWithNick(savedNick); }
 </script>
 </body>
 </html>
