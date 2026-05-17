@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Авокадо Кликер | Чистовой аукцион</title>
+    <title>Авокадо Кликер</title>
     <style>
         * {
             user-select: none;
@@ -147,7 +147,7 @@
         }
         .mega-clicker:active { transform: scale(0.96); }
         .click-icon { font-size: 4rem; margin-bottom: 8px; pointer-events: none; }
-        .click-power-info { background: #0a2f1a; padding: 4px 12px; border-radius: 40px; font-size: 0.7rem; font-weight: bold; color: #a5d6a5; display: inline-block; margin-top: 8px; }
+        .click-power-info { background: #0a2f1a; padding: 4px 12px; border-radius: 40px; font-size: 0.75rem; font-weight: bold; color: #a5d6a5; display: inline-block; margin-top: 8px; }
         .upgrades-grid { display: flex; flex-direction: column; gap: 12px; max-height: 55vh; overflow-y: auto; }
         .upgrade-card { background: #1a4a2a; border-radius: 28px; padding: 10px 12px; border: 1px solid #6fbf4c; }
         .upgrade-title { font-size: 0.9rem; font-weight: bold; color: #f5e6d3; display: flex; justify-content: space-between; flex-wrap: wrap; }
@@ -315,7 +315,7 @@
     let activeBooster = null, boosterEndTime = 0;
     let auctionLots = [], auctionEndTime = null;
     let lastDailyBonus = 0, lastHourlyBonus = 0;
-    let inventoryBoosters = []; // { mult, duration }
+    let inventoryBoosters = [];
     
     let clickUpgrades = [
         { id: "c1", name: "Усиленный палец", basePrice: 12, bonus: 1, level: 0, maxLvl: 50 },
@@ -332,7 +332,17 @@
         { id: "i5", name: "Нейросетевой банк", basePrice: 32000, income: 95, level: 0, maxLvl: Infinity }
     ];
 
-    function getClickPower() { let bonus = (activeBooster && Date.now() < boosterEndTime) ? activeBooster.multiplier - 1 : 0; for(let u of clickUpgrades) bonus += u.level * u.bonus; return 1 + bonus; }
+    function getClickPower() { 
+        let bonus = (activeBooster && Date.now() < boosterEndTime) ? activeBooster.multiplier - 1 : 0; 
+        for(let u of clickUpgrades) bonus += u.level * u.bonus; 
+        return 1 + bonus; 
+    }
+    
+    function updatePowerDisplay() {
+        let power = getClickPower();
+        document.getElementById("powerInfo").innerHTML = `Сила: ${power}`;
+    }
+    
     function getTotalIncome() { let t=0; for(let u of incomeUpgrades) t+=u.level*u.income; return t; }
     function getClickPrice(up) { if(up.level>=up.maxLvl) return Infinity; let p=Math.floor(up.basePrice+up.level*up.basePrice*0.6); if(up.id==="c1") return Math.min(p,38000); if(up.id==="c2") return Math.min(p,120000); if(up.id==="c3") return Math.min(p,280000); return Math.min(p,2500000); }
     function getIncomePrice(up) { if(up.level>=up.maxLvl) return Infinity; let mult=1+(up.level/25); let p=Math.floor(up.basePrice*Math.pow(mult,1.4)); if(up.id==="i1"||up.id==="i2"||up.id==="i3") return Math.min(p,950000); return Math.min(p,5000000); }
@@ -376,7 +386,7 @@
     
     function updateUI() {
         document.getElementById("balansDisplay").innerText = Math.floor(balansCoins);
-        document.getElementById("powerInfo").innerHTML = `Сила: ${getClickPower()}`;
+        updatePowerDisplay();
         document.getElementById("totalIncomeDisplay").innerHTML = `Пассивный доход: ${getTotalIncome()}/сек`;
         renderUpgrades();
         renderInventory();
@@ -389,8 +399,37 @@
     
     function showMessage(text, color) { let div = document.createElement("div"); div.className = "floating"; div.innerText = text; div.style.background = color; document.body.appendChild(div); setTimeout(()=>div.remove(),2000); }
     
-    async function loadFullData() { try { let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": API_KEY } }); let data = await res.json(); return data.record; } catch(e) { return { leaders: [], auction: { lots: [], endTime: null } }; } }
-    async function saveFullData(leaders, auctionData) { await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { method: "PUT", headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY }, body: JSON.stringify({ leaders, auction: auctionData }) }); }
+    async function loadFullData() { 
+        try { 
+            let res = await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, { headers: { "X-Master-Key": API_KEY } }); 
+            if (!res.ok) throw new Error();
+            let data = await res.json(); 
+            return data.record; 
+        } catch(e) { 
+            console.error("Ошибка загрузки, использую кэш");
+            let cached = localStorage.getItem(`cached_leaders_${currentPlayer}`);
+            if (cached) {
+                try { return JSON.parse(cached); } catch(e) { return { leaders: [], auction: { lots: [], endTime: null } }; }
+            }
+            return { leaders: [], auction: { lots: [], endTime: null } }; 
+        } 
+    }
+    
+    async function saveFullData(leaders, auctionData) { 
+        if (!leaders || leaders.length === undefined) return false;
+        try { 
+            await fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}`, { 
+                method: "PUT", 
+                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY }, 
+                body: JSON.stringify({ leaders, auction: auctionData }) 
+            });
+            localStorage.setItem(`cached_leaders_${currentPlayer}`, JSON.stringify({ leaders, auction: auctionData }));
+            return true;
+        } catch(e) { 
+            console.error("Ошибка сохранения");
+            return false; 
+        } 
+    }
     
     function getCurrentAuctionEndTime() {
         let now = new Date();
@@ -651,8 +690,31 @@
     }
     
     async function loadLeaders() { let data = await loadFullData(); return data.leaders || []; }
-    async function syncToLeaderboard() { let leaders = await loadLeaders(); let existing = leaders.find(l=>l.name===currentPlayer); if(existing) existing.score = balansCoins; else leaders.push({ name: currentPlayer, score: balansCoins }); leaders.sort((a,b)=>b.score-a.score); leaders=leaders.slice(0,50); await saveFullData(leaders, { lots: auctionLots, endTime: auctionEndTime }); }
-    async function showLeaders() { let leaders = await loadLeaders(); leaders.sort((a,b)=>b.score-a.score); let container = document.getElementById("leaderList"); if(!leaders.length) { container.innerHTML = "<div class='loading'>Нет игроков</div>"; return; } container.innerHTML = ""; leaders.slice(0,20).forEach((l,i)=>{ let row=document.createElement("div"); row.className="leader-row"; row.innerHTML=`<div class="leader-rank">${i===0?"🏆":i===1?"🥈":i===2?"🥉":i+1}</div><div class="leader-name">${l.name}</div><div class="leader-score">${Math.floor(l.score)} 🥑</div>`; container.appendChild(row); }); document.getElementById("lastUpdated").innerHTML = `Обновлено: ${new Date().toLocaleTimeString()}`; }
+    async function syncToLeaderboard() { 
+        let leaders = await loadLeaders(); 
+        if (!leaders) leaders = [];
+        let existing = leaders.find(l=>l.name===currentPlayer); 
+        if (existing) existing.score = balansCoins; 
+        else leaders.push({ name: currentPlayer, score: balansCoins }); 
+        leaders.sort((a,b)=>b.score-a.score); 
+        leaders = leaders.slice(0,50); 
+        await saveFullData(leaders, { lots: auctionLots, endTime: auctionEndTime }); 
+    }
+    async function showLeaders() { 
+        let leaders = await loadLeaders(); 
+        if (!leaders) leaders = [];
+        leaders.sort((a,b)=>b.score-a.score); 
+        let container = document.getElementById("leaderList"); 
+        if(!leaders.length) { container.innerHTML = "<div class='loading'>Нет игроков</div>"; return; } 
+        container.innerHTML = ""; 
+        leaders.slice(0,20).forEach((l,i)=>{ 
+            let row=document.createElement("div"); 
+            row.className="leader-row"; 
+            row.innerHTML=`<div class="leader-rank">${i===0?"🏆":i===1?"🥈":i===2?"🥉":i+1}</div><div class="leader-name">${l.name}</div><div class="leader-score">${Math.floor(l.score)} 🥑</div>`; 
+            container.appendChild(row); 
+        }); 
+        document.getElementById("lastUpdated").innerHTML = `Обновлено: ${new Date().toLocaleTimeString()}`; 
+    }
     
     function onTap(e) { e.preventDefault(); let gain = getClickPower(); if(Math.random()<0.1) gain*=2; balansCoins += gain; updateUI(); saveGameLocal(); }
     function startPassive() { setInterval(()=>{ let inc = getTotalIncome(); if(inc>0){ balansCoins+=inc; updateUI(); saveGameLocal(); } },1000); }
