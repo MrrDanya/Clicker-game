@@ -309,7 +309,6 @@
 <script>
     const BIN_ID = "6a0485ac250b1311c344dc9e";
     const API_KEY = "$2a$10$my.qCD0x0BIW5ej4vxtLF.IoXo3AJq6R5uhspSb1ZfvAeAu7UFHby";
-    const AUCTION_KEY = "main_auction";
     
     let currentPlayer = null, balansCoins = 0;
     let activeBooster = null, boosterEndTime = 0;
@@ -332,10 +331,21 @@
         { id: "i5", name: "Нейросетевой банк", basePrice: 32000, income: 95, level: 0, maxLvl: Infinity }
     ];
 
+    // ========== НОВАЯ ФОРМУЛА СИЛЫ КЛИКА ==========
+    // Базовая сила = 1 + бонус от улучшений
+    // Бустер множит ВСЮ силу: сила * множитель
+    function getBasePower() {
+        let bonus = 0;
+        for(let u of clickUpgrades) bonus += u.level * u.bonus;
+        return 1 + bonus;
+    }
+    
     function getClickPower() { 
-        let bonus = (activeBooster && Date.now() < boosterEndTime) ? activeBooster.multiplier - 1 : 0; 
-        for(let u of clickUpgrades) bonus += u.level * u.bonus; 
-        return 1 + bonus; 
+        let basePower = getBasePower();
+        if (activeBooster && Date.now() < boosterEndTime) {
+            return Math.floor(basePower * activeBooster.multiplier);
+        }
+        return basePower;
     }
     
     function updatePowerDisplay() {
@@ -406,7 +416,6 @@
             let data = await res.json(); 
             return data.record; 
         } catch(e) { 
-            console.error("Ошибка загрузки, использую кэш");
             let cached = localStorage.getItem(`cached_leaders_${currentPlayer}`);
             if (cached) {
                 try { return JSON.parse(cached); } catch(e) { return { leaders: [], auction: { lots: [], endTime: null } }; }
@@ -426,7 +435,6 @@
             localStorage.setItem(`cached_leaders_${currentPlayer}`, JSON.stringify({ leaders, auction: auctionData }));
             return true;
         } catch(e) { 
-            console.error("Ошибка сохранения");
             return false; 
         } 
     }
